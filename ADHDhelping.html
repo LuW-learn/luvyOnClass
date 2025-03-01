@@ -18,8 +18,7 @@
     <nav>
         <ul>
             <li><a href="#">首页</a></li>
-            <li><a href="#">训练游戏</a></li>
-            <li><a href="#">知识文章</a></li>
+            <li><a href="#">科普文章</a></li>
             <li><a href="#">联系我们</a></li>
         </ul>
     </nav>
@@ -39,35 +38,20 @@
             <p>ADHD（注意力缺陷多动障碍）是一种常见的神经发育障碍......通过我们的平台，你可以找到有效的方法提升专注力。</p>
         </section>
 
-        <!-- 训练游戏展示 -->
-        <section class="games">
-            <h2>专注力训练游戏</h2>
-            <div class="game-item">
-                <img src="game1.jpg" alt="游戏1">
-                <h3>记忆卡片游戏</h3>
-                <p>通过记忆卡片位置来锻炼注意力和记忆力。</p>
-                <a href="#" class="btn" onclick="openMemoryGame()">开始游戏</a>
-            </div>
-            <div class="game-item">
-                <img src="game2.jpg" alt="游戏2">
-                <h3>找不同游戏</h3>
-                <p>在两幅相似图片中找出不同之处，提升专注力。</p>
-                <a href="#" class="btn" onclick="openSpotTheDifferenceGame()">开始游戏</a>
-            </div>
-        </section>
-
         <!-- 知识文章展示 -->
         <section class="articles">
-            <h2>相关知识文章</h2>
+            <h2>ADHD相关科普文章</h2>
             <div class="article-item">
-                <h3>ADHD的症状与诊断</h3>
-                <p>发布时间：2023-10-15</p>
-                <a href="#" class="btn">阅读全文</a>
+                <h3><a href="article1.html">ADHD的症状与诊断</a></h3>
+                <p>发布时间：2025-03-01</p>
             </div>
             <div class="article-item">
-                <h3>提升专注力的日常方法</h3>
-                <p>发布时间：2023-11-20</p>
-                <a href="#" class="btn">阅读全文</a>
+                <h3><a href="article2.html">ADHD的治疗方法与建议</a></h3>
+                <p>发布时间：2025-02-15</p>
+            </div>
+            <div class="article-item">
+                <h3><a href="article3.html">如何在生活中帮助ADHD患者</a></h3>
+                <p>发布时间：2025-01-20</p>
             </div>
         </section>
     </main>
@@ -76,22 +60,6 @@
     <footer>
         <p>版权所有 &copy; 2025 ADHD专注力提升平台</p>
     </footer>
+</body>
 
-    <!-- 记忆卡片游戏弹窗 -->
-    <div id="memory-game-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeMemoryGame()">&times;</span>
-            <h2>记忆卡片游戏</h2>
-            <div id="memory-cards"></div>
-            <button onclick="startMemoryGame()">开始游戏</button>
-        </div>
-    </div>
-
-    <!-- 找不同游戏弹窗 -->
-    <div id="spot-the-difference-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeSpotTheDifferenceGame()">&times;</span>
-            <h2>找不同游戏</h2>
-            <img id="image1" src="diff1.jpg" alt="图片1">
-            <img id="image2" src="diff2.jpg" alt="图片2">
-            <p
+</html>
