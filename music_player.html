@@ -13,8 +13,8 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            /* 使用差异更大的颜色来增强渐变效果 */
-            background: linear-gradient(45deg, #7a529c, #c8a8e4);
+            /* 修改为蒂芙尼蓝到渐变绿的背景 */
+            background: linear-gradient(45deg, #0abab5, #7CFC00);
         }
 
         .record-container {
@@ -111,9 +111,7 @@
 <body>
     <!-- 此处可替换歌词内容 -->
     <div class="lyrics">
-        <p>And when you wake up next to him in the middle of the night，<br>With your head in your hands, you're nothing more than his wife，<br>And when you think about me, all of those years ago，<br>You're standing face to face with "I told you so"，<br>You know I hate to say, I told you so，
-You know I hate to say it but, I told you so，<br>You can kiss a hundred boys in bars，<br>Shoot another shot, try to stop the feeling，<br>You can say it's just the way you are，<br>Make a new excuse, another stupid reason，<br>Good luck, babe! Well good luck, babe!<br>You'd have to stop the world just to stop the feeling，<br>Good luck, babe! Well good luck, babe!<br>You'd have to stop the world just to stop the feeling，<br>You'd have to stop the world just to stop the feeling，<br>You'd have to stop the world just to stop the feeling，<br>
-You'd have to stop the world just to stop the feeling</p>
+        <p>これでいいなのだ　好好好，<br>好きの需要と供給の寒暖差　また風邪っぴきさん，<br>忍ぶ修行は効率が肝心だとか　わかってるもん，<br>でも簡単じゃない　ねえ簡単じゃないの，<br>心の乙女があれこれ言っちゃうの，<br>くぅ問題が大　ねえ頑張ってドクター　感情が爆散，<br>頭あちちな　好好好のラブ連単，<br>きみとしたいことがいっぱい，<br>いつも「足んないな」ってなる問題，<br>欲張り星人のせいなんです，<br>もう　嫌い　大嫌いとか思ってみたい。</p>
     </div>
     <button class="pause-button" onclick="togglePause()">暂停</button>
     <div class="record-container">
@@ -121,10 +119,14 @@ You'd have to stop the world just to stop the feeling</p>
             <div class="record-grooves"></div>
             <!-- 此处可替换圆形图片链接 -->
             <div class="center-image">
-                <img src="chapall.jpg" alt="Center Image">
+                <img src="miku.jpg" alt="Center Image">
             </div>
         </div>
     </div>
+    <!-- 此处可替换音乐文件链接，添加 autoplay 属性使页面打开自动播放音乐 -->
+    <audio id="music" autoplay>
+        <source src="好好好.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         let isPaused = false;
@@ -133,6 +135,7 @@ You'd have to stop the world just to stop the feeling</p>
         const centerImage = document.querySelector('.center-image');
         const lyrics = document.querySelector('.lyrics p');
         const pauseButton = document.querySelector('.pause-button');
+        const music = document.getElementById('music');
 
         function togglePause() {
             if (isPaused) {
@@ -141,17 +144,18 @@ You'd have to stop the world just to stop the feeling</p>
                 centerImage.style.animationPlayState = 'running';
                 lyrics.style.animationPlayState = 'running';
                 pauseButton.textContent = '暂停';
+                music.play();
             } else {
                 record.style.animationPlayState = 'paused';
                 recordGrooves.style.animationPlayState = 'paused';
                 centerImage.style.animationPlayState = 'paused';
                 lyrics.style.animationPlayState = 'paused';
                 pauseButton.textContent = '继续';
+                music.pause();
             }
             isPaused = !isPaused;
         }
     </script>
 </body>
 
-</html>
-    
+</html>    
