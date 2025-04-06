@@ -13,7 +13,8 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background: linear-gradient(45deg, #0abab5, #7CFC00);
+            /* 使用 HSL 颜色模式降低饱和度，这里饱和度设置为 40% */
+            background: linear-gradient(45deg, hsl(0, 40%, 30%), hsl(16, 40%, 60%));
         }
 
         .record-container {
@@ -54,8 +55,8 @@
         .lyrics p {
             position: relative;
             top: 0;
-            /* 将歌词滚动动画的持续时间延长到 20s */
-            animation: scroll 20s linear infinite;
+            /* 将歌词滚动动画的持续时间设置为 210s */
+            animation: scroll 210s linear infinite;
         }
 
         @keyframes scroll {
@@ -67,11 +68,39 @@
             }
         }
 
-        .pause-button {
-            padding: 10px 20px;
-            font-size: 16px;
+        /* 暂停和播放按钮样式 */
+        .play-pause-button {
+            width: 50px;
+            height: 50px;
+            background-color: white;
             cursor: pointer;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 暂停按钮样式（两个竖条） */
+        .pause-icon {
+            width: 12px;
+            height: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pause-icon span {
+            width: 4px;
+            height: 100%;
+            background-color: black;
+        }
+
+        /* 播放按钮样式（三角形） */
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 25px solid black;
         }
 
         .record img {
@@ -85,18 +114,26 @@
 <body>
     <!-- 此处可替换歌词内容 -->
     <div class="lyrics">
-        <p>これでいいなのだ　好好好，<br>好きの需要と供給の寒暖差　また風邪っぴきさん，<br>忍ぶ修行は効率が肝心だとか　わかってるもん，<br>でも簡単じゃない　ねえ簡単じゃないの，<br>心の乙女があれこれ言っちゃうの，<br>くぅ問題が大　ねえ頑張ってドクター　感情が爆散，<br>頭あちちな　好好好のラブ連単，<br>きみとしたいことがいっぱい，<br>いつも「足んないな」ってなる問題，<br>欲張り星人のせいなんです，<br>もう　嫌い　大嫌いとか思ってみたい。</p>
+        <p>Oeasy的作业<br>Oeasy的作业</p>
     </div>
-    <button class="pause-button" onclick="togglePause()">暂停</button>
+    <!-- 修改为自定义的播放暂停按钮 -->
+    <div class="play-pause-button" onclick="togglePause()">
+        <div class="pause-icon">
+            <span></span>
+            <span></span>
+        </div>
+        <div class="play-icon" style="display: none;"></div>
+    </div>
     <div class="record-container">
         <div class="record">
             <!-- 此处可替换旋转的图片链接 -->
-            <img src="miku.jpg" alt="Rotating Image">
+            <img src="洛天依.jpg">
         </div>
     </div>
     <!-- 此处可替换音乐文件链接，添加 autoplay 属性使页面打开自动播放音乐 -->
     <audio id="music" autoplay>
-        <source src="好好好.mp3" type="audio/mpeg">
+        <source src="your_music_file.mp3" type="audio/mpeg">
+        你的浏览器不支持音频播放。
     </audio>
 
     <script>
@@ -104,7 +141,9 @@
         const record = document.querySelector('.record');
         const recordImg = document.querySelector('.record img');
         const lyrics = document.querySelector('.lyrics p');
-        const pauseButton = document.querySelector('.pause-button');
+        const playPauseButton = document.querySelector('.play-pause-button');
+        const pauseIcon = document.querySelector('.pause-icon');
+        const playIcon = document.querySelector('.play-icon');
         const music = document.getElementById('music');
 
         function togglePause() {
@@ -112,13 +151,15 @@
                 record.style.animationPlayState = 'running';
                 recordImg.style.animationPlayState = 'running';
                 lyrics.style.animationPlayState = 'running';
-                pauseButton.textContent = '暂停';
+                pauseIcon.style.display = 'flex';
+                playIcon.style.display = 'none';
                 music.play();
             } else {
                 record.style.animationPlayState = 'paused';
                 recordImg.style.animationPlayState = 'paused';
                 lyrics.style.animationPlayState = 'paused';
-                pauseButton.textContent = '继续';
+                pauseIcon.style.display = 'none';
+                playIcon.style.display = 'block';
                 music.pause();
             }
             isPaused = !isPaused;
@@ -126,4 +167,4 @@
     </script>
 </body>
 
-</html>
+</html>    
