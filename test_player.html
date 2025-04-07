@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐播放界面</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            /* 使用 HSL 颜色模式降低饱和度，这里饱和度设置为 40% */
+            background: linear-gradient(45deg, hsl(0, 40%, 30%), hsl(16, 40%, 60%));
+        }
+
+        .record-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .record {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: rotate 5s linear infinite;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .lyrics {
+            width: 300px;
+            height: 100px;
+            overflow: hidden;
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .lyrics p {
+            position: relative;
+            top: 0;
+            /* 将歌词滚动动画的持续时间设置为 210s */
+            animation: scroll 210s linear infinite;
+        }
+
+        @keyframes scroll {
+            from {
+                top: 100%;
+            }
+            to {
+                top: -100%;
+            }
+        }
+
+        /* 暂停和播放按钮样式 */
+        .play-pause-button {
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 暂停按钮样式（两个竖条） */
+        .pause-icon {
+            width: 12px;
+            height: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pause-icon span {
+            width: 4px;
+            height: 100%;
+            background-color: black;
+        }
+
+        /* 播放按钮样式（三角形） */
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 25px solid black;
+        }
+
+        .record img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 下载按钮样式 */
+        .download-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 此处可替换歌词内容 -->
+    <div class="lyrics">
+        <p>这是第一句歌词<br>这是第二句歌词<br>这是第三句歌词<br>这是第四句歌词</p>
+    </div>
+    <!-- 修改为自定义的播放暂停按钮 -->
+    <div class="play-pause-button" onclick="togglePause()">
+        <div class="pause-icon">
+            <span></span>
+            <span></span>
+        </div>
+        <div class="play-icon" style="display: none;"></div>
+    </div>
+    <div class="record-container">
+        <div class="record">
+            <!-- 此处可替换旋转的图片链接 -->
+            <img src="https://dummyimage.com/300x300/000/fff" alt="Rotating Image">
+        </div>
+    </div>
+    <!-- 此处可替换音乐文件链接，添加 autoplay 属性使页面打开自动播放音乐 -->
+    <audio id="music" autoplay>
+        <source src="your_music_file.mp3" type="audio/mpeg">
+        你的浏览器不支持音频播放。
+    </audio>
+    <!-- 下载 HTML 文件按钮 -->
+    <button class="download-button" onclick="downloadHTML()">下载 HTML 文件</button>
+    <!-- 下载 Python 代码文件按钮 -->
+    <button class="download-button" onclick="downloadPython()">下载 Python 代码文件</button>
+
+    <script>
+        let isPaused = false;
+        const record = document.querySelector('.record');
+        const recordImg = document.querySelector('.record img');
+        const lyrics = document.querySelector('.lyrics p');
+        const playPauseButton = document.querySelector('.play-pause-button');
+        const pauseIcon = document.querySelector('.pause-icon');
+        const playIcon = document.querySelector('.play-icon');
+        const music = document.getElementById('music');
+
+        function togglePause() {
+            if (isPaused) {
+                record.style.animationPlayState = 'running';
+                recordImg.style.animationPlayState = 'running';
+                lyrics.style.animationPlayState = 'running';
+                pauseIcon.style.display = 'flex';
+                playIcon.style.display = 'none';
+                music.play();
+            } else {
+                record.style.animationPlayState = 'paused';
+                recordImg.style.animationPlayState = 'paused';
+                lyrics.style.animationPlayState = 'paused';
+                pauseIcon.style.display = 'none';
+                playIcon.style.display = 'block';
+                music.pause();
+            }
+            isPaused = !isPaused;
+        }
+
+        function downloadHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'music_player.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadPython() {
+            // 替换为你实际的 Python 文件内容
+            const pythonCode = "import mido
+from mido import Message, MidiFile, MidiTrack
+
+def create_fixed_jpop():
+    mid = MidiFile(ticks_per_beat=480)
+    lead = MidiTrack()
+    chords = MidiTrack()
+    drums = MidiTrack()
+    mid.tracks.extend([lead, chords, drums])
+
+    # 音色设置（使用独立通道）
+    lead.append(Message('program_change', program=80, channel=0, time=0))  # 主旋律通道0
+    chords.append(Message('program_change', program=25, channel=1, time=0)) # 和弦通道1
+    drums.append(Message('program_change', program=0, channel=9, time=0))   # 鼓组通道9
+
+    # 修复关键：正确的时间累计系统
+    def build_track(track, events):
+        elapsed = 0
+        for msg in events:
+            msg.time += elapsed
+            elapsed = 0
+            track.append(msg)
+
+    # 主旋律（两段重复）
+    lead_events = []
+    for _ in range(2):  # 重复两次
+        lead_events += [
+            Message('note_on', note=72, velocity=75, time=0),
+            Message('note_off', note=72, time=480),
+            Message('note_on', note=74, velocity=75, time=0),
+            Message('note_off', note=74, time=240),
+            Message('note_on', note=76, velocity=75, time=0),
+            Message('note_off', note=76, time=720)
+        ]
+    build_track(lead, lead_events)
+
+    # 和弦进行（持续循环）
+    chord_events = []
+    chord_seq = [60, 67, 69, 65]  # C-G-Am-F
+    for _ in range(4):  # 循环4次（32秒）
+        for root in chord_seq:
+            chord_events += [
+                Message('note_on', note=root, velocity=60, time=0),
+                Message('note_on', note=root+4, velocity=60, time=0),
+                Message('note_on', note=root+7, velocity=60, time=0),
+                Message('note_off', note=root, time=1920),
+                Message('note_off', note=root+4, time=0),
+                Message('note_off', note=root+7, time=0)
+            ]
+    build_track(chords, chord_events)
+
+    # 鼓组（持续节奏）
+    drum_events = []
+    for _ in range(16):  # 16小节循环
+        drum_events += [
+            Message('note_on', note=36, velocity=90, channel=9, time=0),  # 底鼓
+            Message('note_off', note=36, time=240, channel=9),
+            Message('note_on', note=42, velocity=70, channel=9, time=0),  # 踩镲
+            Message('note_off', note=42, time=240, channel=9)
+        ]
+    build_track(drums, drum_events)
+
+    mid.save('jpop_fixed.mid')
+    print("修复版生成成功！导入DAW时注意：\n"
+          "1. 每个音轨分配到独立通道\n"
+          "2. 检查所有通道的音色加载")
+
+create_fixed_jpop()"
+# 示例 Python 代码，用于演示下载功能
+
+;
+            const blob = new Blob([pythonCode], { type: 'text/python' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'your_python_file.py';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+
+</html>    
