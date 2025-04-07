@@ -13,8 +13,8 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            /* 使用 HSL 颜色模式降低饱和度，这里饱和度设置为 40% */
             background: linear-gradient(45deg, hsl(0, 40%, 30%), hsl(16, 40%, 60%));
+            font-family: Arial, sans-serif;
         }
 
         .record-container {
@@ -55,7 +55,6 @@
         .lyrics p {
             position: relative;
             top: 0;
-            /* 将歌词滚动动画的持续时间设置为 210s */
             animation: scroll 210s linear infinite;
         }
 
@@ -68,7 +67,6 @@
             }
         }
 
-        /* 暂停和播放按钮样式 */
         .play-pause-button {
             width: 50px;
             height: 50px;
@@ -80,7 +78,6 @@
             align-items: center;
         }
 
-        /* 暂停按钮样式（两个竖条） */
         .pause-icon {
             width: 12px;
             height: 30px;
@@ -94,7 +91,6 @@
             background-color: black;
         }
 
-        /* 播放按钮样式（三角形） */
         .play-icon {
             width: 0;
             height: 0;
@@ -109,22 +105,57 @@
             object-fit: cover;
         }
 
-        /* 下载按钮样式 */
         .download-button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            margin: 5px;
+            margin: 10px 0;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-button:hover {
+            background-color: #0056b3;
+        }
+
+        .code-box {
+            width: 400px;
+            height: 200px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 
 <body>
-    <!-- 此处可替换歌词内容 -->
     <div class="lyrics">
         <p>这是第一句歌词<br>这是第二句歌词<br>这是第三句歌词<br>这是第四句歌词</p>
     </div>
-    <!-- 修改为自定义的播放暂停按钮 -->
     <div class="play-pause-button" onclick="togglePause()">
         <div class="pause-icon">
             <span></span>
@@ -134,63 +165,17 @@
     </div>
     <div class="record-container">
         <div class="record">
-            <!-- 此处可替换旋转的图片链接 -->
             <img src="https://dummyimage.com/300x300/000/fff" alt="Rotating Image">
         </div>
     </div>
-    <!-- 此处可替换音乐文件链接，添加 autoplay 属性使页面打开自动播放音乐 -->
     <audio id="music" autoplay>
         <source src="your_music_file.mp3" type="audio/mpeg">
         你的浏览器不支持音频播放。
     </audio>
-    <!-- 下载 HTML 文件按钮 -->
-    <button class="download-button" onclick="downloadHTML()">下载 HTML 文件</button>
-    <!-- 下载 Python 代码文件按钮 -->
-    <button class="download-button" onclick="downloadPython()">下载 Python 代码文件</button>
-
-    <script>
-        let isPaused = false;
-        const record = document.querySelector('.record');
-        const recordImg = document.querySelector('.record img');
-        const lyrics = document.querySelector('.lyrics p');
-        const playPauseButton = document.querySelector('.play-pause-button');
-        const pauseIcon = document.querySelector('.pause-icon');
-        const playIcon = document.querySelector('.play-icon');
-        const music = document.getElementById('music');
-
-        function togglePause() {
-            if (isPaused) {
-                record.style.animationPlayState = 'running';
-                recordImg.style.animationPlayState = 'running';
-                lyrics.style.animationPlayState = 'running';
-                pauseIcon.style.display = 'flex';
-                playIcon.style.display = 'none';
-                music.play();
-            } else {
-                record.style.animationPlayState = 'paused';
-                recordImg.style.animationPlayState = 'paused';
-                lyrics.style.animationPlayState = 'paused';
-                pauseIcon.style.display = 'none';
-                playIcon.style.display = 'block';
-                music.pause();
-            }
-            isPaused = !isPaused;
-        }
-
-        function downloadHTML() {
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'music_player.html';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function downloadPython() {
-            // 替换为你实际的 Python 文件内容
-            const pythonCode = "import mido
+    <button class="download-button" onclick="downloadHTML()">下载本播放器 HTML 代码</button>
+    <div class="code-box">
+        <pre id="midi-code">
+import mido
 from mido import Message, MidiFile, MidiTrack
 
 def create_fixed_jpop():
@@ -257,17 +242,63 @@ def create_fixed_jpop():
           "1. 每个音轨分配到独立通道\n"
           "2. 检查所有通道的音色加载")
 
-create_fixed_jpop()"
-# 示例 Python 代码，用于演示下载功能
+create_fixed_jpop()
+        </pre>
+        <button class="copy-button" onclick="copyCode()">一键复制</button>
+    </div>
 
-;
-            const blob = new Blob([pythonCode], { type: 'text/python' });
+    <script>
+        let isPaused = false;
+        const record = document.querySelector('.record');
+        const recordImg = document.querySelector('.record img');
+        const lyrics = document.querySelector('.lyrics p');
+        const playPauseButton = document.querySelector('.play-pause-button');
+        const pauseIcon = document.querySelector('.pause-icon');
+        const playIcon = document.querySelector('.play-icon');
+        const music = document.getElementById('music');
+
+        function togglePause() {
+            if (isPaused) {
+                record.style.animationPlayState = 'running';
+                recordImg.style.animationPlayState = 'running';
+                lyrics.style.animationPlayState = 'running';
+                pauseIcon.style.display = 'flex';
+                playIcon.style.display = 'none';
+                music.play();
+            } else {
+                record.style.animationPlayState = 'paused';
+                recordImg.style.animationPlayState = 'paused';
+                lyrics.style.animationPlayState = 'paused';
+                pauseIcon.style.display = 'none';
+                playIcon.style.display = 'block';
+                music.pause();
+            }
+            isPaused = !isPaused;
+        }
+
+        function downloadHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'your_python_file.py';
+            a.download = 'music_player.html';
+            a.style.display = 'none';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }
+
+        function copyCode() {
+            const codeElement = document.getElementById('midi-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('代码已复制到剪贴板');
         }
     </script>
 </body>
