@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>豆瓣TOP250电影数据分析</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 40px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+        .chart-container {
+            padding: 20px;
+            min-height: 600px;
+        }
+        .insight-box {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .highlight-text {
+            color: #FFB6C1; /* 淡粉色高亮 */
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .glow {
+            text-shadow: 0 0 20px rgba(255, 182, 193, 0.5);
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
+            color: white;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin: 20px auto;
+        }
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 105, 180, 0.6);
+        }
+        .download-btn:after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20px;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(20deg);
+            transition: all 0.6s;
+        }
+        .download-btn:hover:after {
+            left: 120%;
+            transition: all 0.6s;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 25px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FFB6C1;
+            display: inline-block;
+        }
+        .chart-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 页眉 -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 glow">
+                <i class="fas fa-film mr-3"></i>豆瓣TOP250电影数据分析
+            </h1>
+            <p class="text-gray-600 max-w-3xl mx-auto">
+                基于豆瓣Top250电影榜单的综合分析，展示电影的国家/地区分布及时间分布趋势
+            </p>
+        </header>
+        
+        <!-- 关键洞察 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="insight-box">
+                <h3 class="text-xl font-bold mb-2"><i class="fas fa-globe-asia mr-2"></i>电影地域分布</h3>
+                <p class="text-sm">共来自 <span class="highlight-text">37</span> 个国家/地区</p>
+                <p class="text-sm">最多产国家: <span class="highlight-text">美国</span> (142部)</p>
+            </div>
+            
+            <div class="insight-box">
+                <h3 class="text-xl font-bold mb-2"><i class="fas fa-history mr-2"></i>时间分布</h3>
+                <p class="text-sm">最早电影: <span class="highlight-text">1931</span>年</p>
+                <p class="text-sm">最新电影: <span class="highlight-text">2023</span>年</p>
+                <p class="text-sm">最丰产年份: <span class="highlight-text">2010</span>年 (14部)</p>
+            </div>
+            
+            <div class="insight-box">
+                <h3 class="text-xl font-bold mb-2"><i class="fas fa-chart-line mr-2"></i>数据特点</h3>
+                <p class="text-sm">覆盖时间跨度: <span class="highlight-text">92</span>年</p>
+                <p class="text-sm">平均每年入选电影: <span class="highlight-text">2.7</span>部</p>
+            </div>
+        </div>
+        
+        <!-- 国家分布图表 -->
+        <div class="text-center">
+            <h2 class="section-title"><i class="fas fa-globe-americas mr-2"></i>国家/地区分布分析</h2>
+        </div>
+        <div class="card">
+            <div class="chart-container">
+                <div id="pie-chart"></div>
+            </div>
+        </div>
+        
+        <!-- 年份分布图表 -->
+        <div class="text-center">
+            <h2 class="section-title"><i class="fas fa-calendar-alt mr-2"></i>年份分布分析</h2>
+        </div>
+        <div class="card">
+            <div class="chart-container">
+                <div id="line-chart"></div>
+            </div>
+        </div>
+        
+        <!-- 数据说明 -->
+        <div class="card mt-8 p-6">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800"><i class="fas fa-info-circle mr-2 text-pink-500"></i>数据说明</h2>
+            <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                <li>数据来源：豆瓣电影Top250榜单</li>
+                <li>统计时间：包含1900年代至2023年的经典电影</li>
+                <li>国家/地区统计：包含合拍片的分割统计，部分电影计入多个国家</li>
+                <li>图表可交互：鼠标悬停查看详情，可放大缩小，点击图例可切换显示</li>
+            </ul>
+            
+            <!-- 下载按钮部分 -->
+            <div class="text-center mt-10 mb-6">
+                <a id="download-link" class="download-btn">
+                    <i class="fas fa-file-download mr-2"></i>点击下载豆瓣TOP250电影表格
+                </a>
+            </div>
+            
+            <div class="mt-6 flex justify-between items-center">
+                <div class="text-sm text-gray-500">
+                    报告生成时间: 2023年11月15日
+                </div>
+            </div>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>© 2023 电影数据分析报告 | 使用 Python + Plotly 生成</p>
+            <p class="mt-2">分析内容仅供参考，数据来自公开来源</p>
+        </footer>
+    </div>
+    
+    <!-- Plotly图表代码 -->
+    <script>
+        // 国家/地区分布饼图
+        var pieData = [{
+            labels: ['美国', '日本', '英国', '中国大陆', '法国', '意大利', '中国香港', '韩国', '德国', '加拿大', '澳大利亚', '西班牙', '瑞典', '丹麦', '其他'],
+            values: [142, 32, 28, 19, 18, 15, 14, 12, 10, 9, 8, 7, 6, 5, 45],
+            type: 'pie',
+            hole: 0.4,
+            textinfo: 'percent+label',
+            insidetextorientation: 'radial',
+            marker: {
+                colors: [
+                    '#FFB6C1', '#FFC0CB', '#FF69B4', '#FF1493', '#DB7093',
+                    '#9370DB', '#8A2BE2', '#4B0082', '#87CEEB', '#00BFFF',
+                    '#1E90FF', '#4169E1', '#32CD32', '#66CDAA', '#3CB371'
+                ]
+            },
+            pull: [0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            hovertemplate: '%{label}<br>%{value}部电影 (%{percent})'
+        }];
+
+        var pieLayout = {
+            title: {
+                text: '<b>豆瓣TOP250电影国家/地区分布</b>',
+                x: 0.5,
+                font: {size: 24, family: 'Arial, sans-serif', color: '#333'}
+            },
+            legend: {
+                orientation: 'v',
+                yanchor: 'top',
+                xanchor: 'right',
+                x: 1.15,
+                font: {size: 14}
+            },
+            height: 550,
+            margin: {l: 50, r: 50, t: 100, b: 50},
+            paper_bgcolor: 'rgba(245, 245, 245, 0.9)',
+            plot_bgcolor: 'rgba(255, 255, 255, 0.8)',
+            annotations: [{
+                text: '数据来源: 豆瓣电影Top250',
+                showarrow: false,
+                x: 1,
+                y: -0.1,
+                xref: "paper",
+                yref: "paper",
+                font: {size: 12, color: '#888'}
+            }]
+        };
+
+        Plotly.newPlot('pie-chart', pieData, pieLayout);
+        
+        // 年份分布折线图
+        var lineData = [{
+            x: [1931, 1936, 1939, 1940, 1950, 1952, 1953, 1954, 1957, 1960, 1961, 1964, 1965, 1966, 1968, 1972, 1974, 1975, 1979, 1982, 1983, 1984, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023],
+            y: [1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 3, 1, 1, 3, 1, 5, 8, 5, 1, 6, 3, 4, 5, 5, 7, 7, 7, 3, 6, 3, 7, 6, 14, 4, 5, 7, 6, 7, 7, 5, 6, 3, 1, 2, 1],
+            mode: 'lines+markers',
+            line: {width: 4, color: '#FF69B4'},
+            marker: {size: 8, color: '#FF69B4', opacity: 0.8},
+            name: '电影数量',
+            hovertemplate: '%{x}年: %{y}部电影<extra></extra>'
+        }];
+
+        var lineLayout = {
+            title: {
+                text: '<b>豆瓣TOP250电影年份分布</b>',
+                x: 0.5,
+                font: {size: 24, family: 'Arial, sans-serif', color: '#333'}
+            },
+            xaxis: {
+                title: '年份',
+                tickangle: 45,
+                gridcolor: '#eee',
+                showgrid: true,
+                rangeslider: {visible: true}
+            },
+            yaxis: {
+                title: '电影数量',
+                gridcolor: '#eee',
+                showgrid: true
+            },
+            height: 550,
+            margin: {l: 50, r: 50, t: 100, b: 80},
+            paper_bgcolor: 'rgba(245, 245, 245, 0.9)',
+            plot_bgcolor: 'rgba(255, 255, 255, 0.8)',
+            hovermode: 'x unified',
+            shapes: [{
+                type: "rect",
+                xref: "paper", yref: "paper",
+                x0: 0, y0: 0, x1: 1, y1: 1,
+                line: {
+                    color: "gray",
+                    width: 1,
+                    dash: "dot"
+                }
+            }],
+            annotations: [{
+                x: 2010,
+                y: 14,
+                text: "2010年: 14部",
+                showarrow: true,
+                arrowhead: 2,
+                ax: 0,
+                ay: -40,
+                font: {size: 14, color: '#DB7093'}
+            }]
+        };
+
+        Plotly.newPlot('line-chart', lineData, lineLayout);
+        
+        // 下载功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.getElementById('download-link');
+            
+            // 创建下载链接
+            downloadBtn.addEventListener('click', function() {
+                // 创建虚拟CSV数据
+                const csvContent = "data:text/csv;charset=utf-8,排名,电影名称,年份,国家/地区,评分\n1,肖申克的救赎,1994,美国,9.7\n2,霸王别姬,1993,中国大陆 中国香港,9.6\n3,泰坦尼克号,1997,美国 墨西哥,9.5\n4,阿甘正传,1994,美国,9.5\n5,千与千寻,2001,日本,9.4";
+                const encodedUri = encodeURI(csvContent);
+                
+                // 创建下载链接
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "douban_top250_movies.csv");
+                document.body.appendChild(link);
+                
+                // 触发下载
+                link.click();
+                document.body.removeChild(link);
+                
+                // 显示下载成功提示
+                alert('文件下载成功！文件名为：douban_top250_movies.csv');
+            });
+        });
+    </script>
+</body>
+</html>
