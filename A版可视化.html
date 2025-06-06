@@ -304,7 +304,7 @@
                 // 创建下载链接
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "douban_top250_movies.csv");
+                link.setAttribute("download", "豆瓣电影top250数据.xlsx");
                 document.body.appendChild(link);
                 
                 // 触发下载
@@ -312,7 +312,7 @@
                 document.body.removeChild(link);
                 
                 // 显示下载成功提示
-                alert('文件下载成功！文件名为：douban_top250_movies.csv');
+                alert('文件下载成功！文件名为："豆瓣电影top250数据.xlsx');
             });
         });
     </script>
