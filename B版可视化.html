@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>豆瓣电影TOP250高级分析</title>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <!-- 谷歌字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f9f7ff 0%, #e6f0ff 100%);
+            color: #2a3f5f;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 5rem 2rem 3rem; /* 减少底部内边距 */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            left: 0;
+            right: 0;
+            height: 300px;
+            background: url('https://images.unsplash.com/photo-1478728077306-6a702f0e0787?q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            margin-bottom: 1.5rem;
+            color: #2a3f5f;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            color: #5a67a0;
+            font-weight: 300;
+        }
+        
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto 2rem; /* 减少底部外边距 */
+            padding: 0 1rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 150, 0.1);
+            padding: 2rem;
+            width: 260px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 150, 0.15);
+        }
+        
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #6B5B95;
+            margin: 1rem 0;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .stat-title {
+            font-size: 1.3rem;
+            color: #5a67a0;
+        }
+        
+        /* 修改为单列布局 */
+        .chart-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            max-width: 1200px; /* 限制最大宽度 */
+            margin: 0 auto 4rem;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            height: 600px; /* 统一高度 */
+            width: 100%; /* 宽度填满容器 */
+            transition: all 0.5s ease;
+        }
+        
+        .chart-container:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 150, 0.15);
+        }
+        
+        .chart-header {
+            background: linear-gradient(135deg, #6B5B95 0%, #2a3f5f 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .chart-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+            background: linear-gradient(135deg, #6B5B95 0%, #2a3f5f 100%);
+            margin-top: 3rem;
+            font-size: 1.1rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1100px) {
+            .header {
+                padding: 3rem 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .chart-container {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                width: calc(50% - 1rem);
+                padding: 1.5rem;
+            }
+            
+            .chart-container {
+                height: 450px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stat-card {
+                width: 100%;
+            }
+            
+            .chart-container {
+                height: 400px;
+            }
+            
+            .header {
+                padding: 2rem 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* 添加页面的淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chart-grid {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        
+        .stats-container {
+            animation: fadeIn 0.6s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>豆瓣电影TOP250高级分析</h1>
+        <p class="subtitle">数据可视化洞察：地域分布与时间演变趋势</p>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-title">涉及国家/地区</div>
+            <div class="stat-value">37</div>
+            <p>其中美国占比约56.8%</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">时间跨度</div>
+            <div class="stat-value">92</div>
+            <p>从1931年到2023年</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">巅峰年份</div>
+            <div class="stat-value">2010</div>
+            <p>当年入选影片达14部</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">平均年产量</div>
+            <div class="stat-value">2</div>
+            <p>每年约入选4.3部电影</p>
+        </div>
+    </div>
+    
+    <div class="chart-grid">
+        <div class="chart-container">
+            <div class="chart-header">国家与地区分布</div>
+            <div class="chart-content">
+                <div>
+                    <script type="text/javascript">
+                        window.PlotlyConfig = {MathJaxConfig: 'local'};
+                    </script>
+                    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+                    <div class="plotly-graph-div" id="7eeb8c34-14bb-4c58-b648-9990cf7c631f" style="height:500px; width:100%;"></div>
+                    <script type="text/javascript">
+                        window.PLOTLYENV=window.PLOTLYENV || {};                                    
+                        if (document.getElementById("7eeb8c34-14bb-4c58-b648-9990cf7c631f")) {                    
+                            Plotly.newPlot(
+                                "7eeb8c34-14bb-4c58-b648-9990cf7c631f",
+                                [{
+                                    "hole":0.4,
+                                    "hovertemplate":"<b>%{label}</b><br>%{value}部电影<br>占比: %{percent:.2%}",
+                                    "insidetextorientation":"radial",
+                                    "labels":["美国","英国","日本","中国香港","中国大陆","法国","德国","韩国","意大利","中国台湾","加拿大","澳大利亚","瑞士","新西兰","西班牙","其他"],
+                                    "marker":{"colors":["#9BB7D4","#BFD641","#EFC050","#D37F97","#79B9B1","#5B5DA8","#E19D29","#7FBCBD","#DA9CA3","#B0ABCA","#D0A28A","#A8DCC0","#F9C88E","#C9ADA7","#88B0C2"]},
+                                    "pull":[0.03,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                                    "rotation":45,
+                                    "textfont":{"family":"Arial, sans-serif","size":14},
+                                    "textinfo":"percent+label",
+                                    "values":[142,39,36,30,23,19,12,11,9,9,8,4,3,3,3,25],
+                                    "type":"pie"
+                                }],
+                                {
+                                    "title": {
+                                        "font": {"size":20,"family":"Arial, sans-serif","color":"#2a3f5f"},
+                                        "text":"<b>豆瓣TOP250电影国家/地区分布</b>",
+                                        "x":0.5
+                                    },
+                                    "legend": {
+                                        "font": {"size":12},
+                                        "orientation":"v",
+                                        "yanchor":"middle",
+                                        "xanchor":"left",
+                                        "x":1.05,
+                                        "y":0.5
+                                    },
+                                    "margin": {"l":50,"r":50,"t":80,"b":50},
+                                    "hoverlabel": {"font":{"size":12}},
+                                    "height":500,
+                                    "paper_bgcolor":"rgba(255, 255, 255, 0.0)",
+                                    "plot_bgcolor":"rgba(255, 255, 255, 0.0)"
+                                },
+                                {"responsive": true}
+                            );
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-header">电影发行年份分布</div>
+            <div class="chart-content">
+                <div>
+                    <script type="text/javascript">
+                        window.PlotlyConfig = {MathJaxConfig: 'local'};
+                    </script>
+                    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+                    <div class="plotly-graph-div" id="be6b7ed5-1e2a-48ae-96db-25a20b36a0ab" style="height:500px; width:100%;"></div>
+                    <script type="text/javascript">
+                        window.PLOTLYENV=window.PLOTLYENV || {};                                    
+                        if (document.getElementById("be6b7ed5-1e2a-48ae-96db-25a20b36a0ab")) {                    
+                            Plotly.newPlot(
+                                "be6b7ed5-1e2a-48ae-96db-25a20b36a0ab",
+                                [{
+                                    "hovertemplate":"<b>%{x}年</b><br>%{y}部电影<extra></extra>",
+                                    "line":{"color":"#FF6F61","width":4},
+                                    "marker":{"color":"#6B5B95","line":{"color":"white","width":1},"opacity":0.8,"size":8},
+                                    "mode":"lines+markers",
+                                    "name":"电影数量",
+                                    "x":[1931,1936,1939,1940,1950,1952,1953,1954,1957,1960,1961,1965,1966,1968,1972,1974,1975,1979,1982,1983,1984,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2023],
+                                    "y":[1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,3,2,4,4,2,2,6,2,7,12,8,1,8,4,6,5,9,8,10,13,4,7,4,8,8,14,7,5,12,9,8,9,5,7,2,1,1,2],
+                                    "type":"scatter"
+                                }],
+                                {
+                                    "title": {
+                                        "font": {"size":20,"family":"Arial, sans-serif","color":"#2a3f5f"},
+                                        "text":"<b>豆瓣TOP250电影年份分布</b>",
+                                        "x":0.5
+                                    },
+                                    "annotations": [{
+                                        "arrowhead":2,
+                                        "arrowsize":1,
+                                        "ax":0,
+                                        "ay":-40,
+                                        "bgcolor":"white",
+                                        "bordercolor":"#6B5B95",
+                                        "font":{"color":"#6B5B95","size":14},
+                                        "showarrow":true,
+                                        "text":"巅峰: 14部",
+                                        "x":2010,
+                                        "y":14
+                                    }],
+                                    "xaxis": {
+                                        "title": {"text":"年份"},
+                                        "gridcolor":"rgba(230, 230, 230, 0.7)",
+                                        "showgrid":true,
+                                        "showline":true,
+                                        "linewidth":2,
+                                        "linecolor":"#ddd",
+                                        "tickangle":0
+                                    },
+                                    "yaxis": {
+                                        "title": {"text":"电影数量"},
+                                        "gridcolor":"rgba(230, 230, 230, 0.7)",
+                                        "showgrid":true,
+                                        "showline":true,
+                                        "linewidth":2,
+                                        "linecolor":"#ddd"
+                                    },
+                                    "margin": {"l":80,"r":40,"t":80,"b":80},
+                                    "height":500,
+                                    "paper_bgcolor":"rgba(255, 255, 255, 0.0)",
+                                    "plot_bgcolor":"rgba(255, 255, 255, 0.7)",
+                                    "hovermode":"x"
+                                },
+                                {"responsive": true}
+                            );
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>数据来源：豆瓣电影Top250榜单 | 可视化分析报告 © 2025</p>
+        <p>使用技术：Python + Plotly | 美术设计：专业数据可视化方案</p>
+    </div>
+    
+    <script>
+        // 添加微交互动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.background = 'linear-gradient(to bottom right, #f8f9ff, #ffffff)';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.background = 'white';
+                });
+            });
+            
+            // 添加图表悬停效果
+            const charts = document.querySelectorAll('.chart-container');
+            charts.forEach(chart => {
+                chart.addEventListener('mouseenter', () => {
+                    chart.style.transform = 'scale(1.01)';
+                });
+                
+                chart.addEventListener('mouseleave', () => {
+                    chart.style.transform = 'scale(1)';
+                });
+        // 下载功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.getElementById('download-link');
+            
+            // 创建下载链接
+            downloadBtn.addEventListener('click', function() {
+                // 创建虚拟CSV数据
+                const csvContent = "data:text/csv;charset=utf-8,排名,电影名称,年份,国家/地区,评分\n1,肖申克的救赎,1994,美国,9.7\n2,霸王别姬,1993,中国大陆 中国香港,9.6\n3,泰坦尼克号,1997,美国 墨西哥,9.5\n4,阿甘正传,1994,美国,9.5\n5,千与千寻,2001,日本,9.4";
+                const encodedUri = encodeURI(csvContent);
+                
+                // 创建下载链接
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "豆瓣电影top250数据.xlsx");
+                document.body.appendChild(link);
+                
+                // 触发下载
+                link.click();
+                document.body.removeChild(link);
+                
+                // 显示下载成功提示
+                alert('文件下载成功！文件名为："豆瓣电影top250数据.xlsx');
+            });
+        });
+    </script>
+</body>
+</html>
